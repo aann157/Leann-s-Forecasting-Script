@@ -1,0 +1,54 @@
+import pandas as pd
+import matplotlib.pyplot as plt
+from statsmodels.tsa.holtwinters import ExponentialSmoothing
+
+# Step 1: Load the dataset from the Excel file
+# Replace with the actual path to your file
+df = pd.read_excel(r'C:\Users\yourusername\YourFolder\your_data.xlsx', engine='openpyxl')  # Update this path
+
+# Ensure that the Date column is in datetime format
+df['Date'] = pd.to_datetime(df['Date'])
+
+# Step 2: Set 'Date' as the index and sort data by date
+df.set_index('Date', inplace=True)
+df.sort_index(inplace=True)
+
+# Option 1: Apply Exponential Smoothing with seasonality (semi-annual)
+# If you have enough data for semi-annual seasonality, use 6 for seasonal periods
+model = ExponentialSmoothing(df['ActualCapacity'], trend='add', seasonal='add', seasonal_periods=6)  # Semi-annual seasonality
+model_fit = model.fit()
+
+# Option 2: Use a Trend-Only Model (no seasonality)
+# Uncomment the line below if you want to use a trend-only model
+# model = ExponentialSmoothing(df['ActualCapacity'], trend='add', seasonal=None)
+# model_fit = model.fit()
+
+# Step 4: Make forecast for the next months (adjust based on your data)
+forecast_steps = 12  # Monthly forecast for 12 months
+forecast = model_fit.forecast(steps=forecast_steps)
+
+# Step 5: Generate forecasted dates for the x-axis
+last_date = df.index[-1]
+forecast_dates = pd.date_range(start=last_date, periods=forecast_steps + 1, freq='M')[1:]
+
+# Step 6: Plot the original data and the forecast with proper date labels
+plt.figure(figsize=(10, 6))
+
+# Plotting the actual data with dates
+plt.plot(df.index, df['ActualCapacity'], label='Actual Capacity', color='blue')
+
+# Plotting the forecast data with forecast dates
+plt.plot(forecast_dates, forecast, label='Forecast', linestyle='--', color='orange')
+
+plt.title('Exponential Smoothing Forecast')
+plt.xlabel('Date')
+plt.ylabel('Actual Capacity')
+
+# Customize x-axis to show monthly labels
+plt.xticks(list(df.index) + list(forecast_dates), 
+           pd.to_datetime(list(df.index) + list(forecast_dates)).strftime('%b %Y'), 
+           rotation=45)
+
+plt.legend()
+plt.tight_layout()
+plt.show()

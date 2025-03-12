@@ -4,7 +4,7 @@ from statsmodels.tsa.holtwinters import ExponentialSmoothing
 
 # Step 1: Load the dataset from the Excel file
 # Replace with the actual path to your file
-df = pd.read_excel(r'C:\Users\yourusername\YourFolder\your_data.xlsx', engine='openpyxl')  # Update this path
+df = pd.read_excel(r'C:\Users\yourusername\YourFolder\your_data.xlsx', engine='openpyxl')  # Update this path and raw data should be in the format of Date (column A) and Actual Capacity (column B) should have minimim 2 years data
 
 # Ensure that the Date column is in datetime format
 df['Date'] = pd.to_datetime(df['Date'])
